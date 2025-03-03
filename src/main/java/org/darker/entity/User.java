@@ -106,26 +106,5 @@ public class User {
 	public void setExpences(List<Expense> expences) {
 		this.expences = expences;
 	}
-	
-	
-	
-	
-	
-	
+		
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

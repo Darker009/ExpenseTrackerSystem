@@ -1,5 +1,5 @@
 package org.darker.entity;
 
-public class Role {
-
+public enum Role {
+	ADMIN, USER
 }

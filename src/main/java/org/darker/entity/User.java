@@ -1,110 +1,49 @@
 package org.darker.entity;
 
-import java.util.List;
-
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "users")
 public class User {
-	@Id
-	@GeneratedValue(strategy= GenerationType.IDENTITY)
-	private Long id;
-	
-	@Column(nullable=false)
-	private String name;
-	
-	@Column(unique = true, nullable=false)
-	private String email;
-	
-	@Column(nullable=false)
-	private String password;
-	
-	@Enumerated(EnumType.STRING)
-	@Column(nullable=false)
-	private Role role;
-	
-	@OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-	private Savings savings;
-	
-	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<Expense> expences;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-	public User() {
-		
-	}
+    @Column(nullable = false)
+    private String name;
 
-	public User(String name, String email, String password, Role role) {
-		this.name = name;
-		this.email = email;
-		this.password = password;
-		this.role = role;
-	}
+    @Column(unique = true, nullable = false)
+    private String email;
 
-	public Long getId() {
-		return id;
-	}
+    @Column(nullable = false)
+    private String password;
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    @Column(nullable = false)
+    private boolean active = true; // Account is active by default
 
-	public String getName() {
-		return name;
-	}
+    // Constructors
+    public User() {}
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public User(String name, String email, String password) {
+        this.name = name;
+        this.email = email;
+        this.password = password;  // Password will be encoded in Service layer
+        this.active = true;
+    }
 
-	public String getEmail() {
-		return email;
-	}
+    // Getters and Setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 
-	public String getPassword() {
-		return password;
-	}
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 
-	public void setPassword(String password) {
-		this.password = password;
-	}
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
 
-	public Role getRole() {
-		return role;
-	}
-
-	public void setRole(Role role) {
-		this.role = role;
-	}
-
-	public Savings getSavings() {
-		return savings;
-	}
-
-	public void setSavings(Savings savings) {
-		this.savings = savings;
-	}
-
-	public List<Expense> getExpences() {
-		return expences;
-	}
-
-	public void setExpences(List<Expense> expences) {
-		this.expences = expences;
-	}
-		
+    public boolean isActive() { return active; }
+    public void setActive(boolean active) { this.active = active; }
 }

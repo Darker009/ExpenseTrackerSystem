@@ -1,19 +1,19 @@
 package org.darker.dto;
 
-public class AuthRequest {
+
+public class RegisterDTO {
     private String name;
     private String email;
     private String password;
 
-    // Constructors
-    public AuthRequest() {}
-    public AuthRequest(String name, String email, String password) {
+    public RegisterDTO() {}
+
+    public RegisterDTO(String name, String email, String password) {
         this.name = name;
         this.email = email;
         this.password = password;
     }
 
-    // Getters & Setters
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
 

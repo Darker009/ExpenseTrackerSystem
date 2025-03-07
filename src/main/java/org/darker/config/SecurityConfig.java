@@ -16,15 +16,15 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .cors(cors -> cors.configure(http))  // Enable CORS
-            .csrf(csrf -> csrf.disable())  // Disable CSRF for APIs
+            .cors(cors -> cors.configure(http))
+            .csrf(csrf -> csrf.disable()) 
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/users/register", "/api/users/login").permitAll()  // Public endpoints
-                .requestMatchers("/api/users/**").authenticated()  // Protect other user APIs
+                .requestMatchers("/api/users/register", "/api/users/login").permitAll()
+                .requestMatchers("/api/users/**").authenticated()
                 .anyRequest().authenticated()
             )
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Stateless session
-            .httpBasic(httpBasic -> httpBasic.disable()); // Disable Basic Authentication
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .httpBasic(httpBasic -> httpBasic.disable());
 
         return http.build();
     }

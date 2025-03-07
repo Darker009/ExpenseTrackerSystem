@@ -1,6 +1,7 @@
 package org.darker.controller;
 
-import org.darker.dto.UserDTO;
+import java.util.Map;
+
 import org.darker.entity.User;
 import org.darker.service.UserService;
 import org.springframework.http.ResponseEntity;
@@ -17,28 +18,36 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<User> registerUser(@RequestBody UserDTO userDTO) {
-        return ResponseEntity.ok(userService.registerUser(userDTO));
+    public ResponseEntity<?> registerUser(@RequestBody User user) {
+        if (user.getEmail() == null || user.getPassword() == null) {
+            return ResponseEntity.badRequest().body("Email and password are required.");
+        }
+        return ResponseEntity.ok(userService.registerUser(user));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<User> loginUser(@RequestBody(required = true) UserDTO userDTO) {
-        
-    	System.out.println(userDTO.getEmail()+"\n "+userDTO.getPassword());
-    	if(userDTO.getEmail()==null || userDTO.getPassword()==null) {
-        	return ResponseEntity.badRequest().body(null);
+    public ResponseEntity<?> loginUser(@RequestBody User user) {
+        if (user.getEmail() == null || user.getPassword() == null) {
+            return ResponseEntity.badRequest().body("Email and password are required.");
         }
-    	return ResponseEntity.ok(userService.loginUser(userDTO.getEmail(), userDTO.getPassword()));
+        return ResponseEntity.ok(userService.loginUser(user.getEmail(), user.getPassword()));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserDetails(@PathVariable Long id) {
-        return ResponseEntity.ok(userService.getUserDetails(id));
+    public ResponseEntity<?> getUserDetails(@PathVariable Long id) {
+    	User user = userService.getUserDetails(id);
+    	if (!user.isActive()) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "message", "User is deactivated. Access denied.",
+                    "status", 400
+                ));
+    	}
+    	return ResponseEntity.ok(user);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody UserDTO userDTO) {
-        return ResponseEntity.ok(userService.updateUser(id, userDTO));
+    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User userUpdates) {
+        return ResponseEntity.ok(userService.updateUser(id, userUpdates));
     }
 
     @DeleteMapping("/{id}")

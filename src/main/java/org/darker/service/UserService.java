@@ -1,14 +1,14 @@
 package org.darker.service;
 
 import jakarta.transaction.Transactional;
-import org.darker.dto.UserDTO;
+
+import java.util.Optional;
+
 import org.darker.entity.User;
 import org.darker.exception.ResourceNotFoundException;
 import org.darker.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 @Transactional
@@ -21,11 +21,11 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public User registerUser(UserDTO userDTO) {
-        if (userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
+    public User registerUser(User user) {
+        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
             throw new IllegalArgumentException("Email already registered");
         }
-        User user = new User(userDTO.getName(), userDTO.getEmail(), passwordEncoder.encode(userDTO.getPassword()));
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
 
@@ -34,25 +34,26 @@ public class UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("Invalid email or password"));
 
         if (passwordEncoder.matches(password, user.getPassword())) {
-        	System.out.println(passwordEncoder.matches(password, user.getPassword()));
-        	return user;
+            return user;
         }
-    	throw new ResourceNotFoundException("Invalid email or password");    
-        
+        throw new ResourceNotFoundException("Invalid email or password");
     }
 
     public User getUserDetails(Long id) {
-        return userRepository.findById(id)
+        User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        return user;
     }
 
-    public User updateUser(Long id, UserDTO userDTO) {
-        User user = getUserDetails(id);
-        user.setName(userDTO.getName());
-        user.setEmail(userDTO.getEmail());
 
-        if (userDTO.getPassword() != null && !userDTO.getPassword().isEmpty()) {
-            user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+    public User updateUser(Long id, User userUpdates) {
+        User user = getUserDetails(id);
+
+        user.setName(userUpdates.getName());
+        user.setEmail(userUpdates.getEmail());
+
+        if (userUpdates.getPassword() != null && !userUpdates.getPassword().isEmpty()) {
+            user.setPassword(passwordEncoder.encode(userUpdates.getPassword()));
         }
 
         return userRepository.save(user);

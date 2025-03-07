@@ -1,8 +1,12 @@
 package org.darker.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class UserDTO {
     private String name;
     private String email;
+    
+    @JsonIgnore
     private String password;
 
     public UserDTO() {}

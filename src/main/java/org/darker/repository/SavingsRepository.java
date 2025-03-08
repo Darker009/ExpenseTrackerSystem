@@ -7,12 +7,9 @@ import java.util.Optional;
 
 public interface SavingsRepository extends JpaRepository<Savings, Long> {
 
-    // ✅ Find Savings by User (more efficient by fetching the full User object)
-    Optional<Savings> findByUser(User user); // This is the correct method
+	Optional<Savings> findByUser(User user);
 
-    // ✅ New method to find Savings by userId
-    Optional<Savings> findByUserId(Long userId);
+	Optional<Savings> findByUserId(Long userId);
 
-    // ✅ Check if Savings account exists for a user by User
-    boolean existsByUser(User user);
+	boolean existsByUser(User user);
 }

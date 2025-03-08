@@ -11,14 +11,14 @@ import java.time.YearMonth;
 @RestController
 @RequestMapping("/api/reports")
 public class MonthlyReportController {
-    private final MonthlyReportService reportService;
+	private final MonthlyReportService reportService;
 
-    public MonthlyReportController(MonthlyReportService reportService) {
-        this.reportService = reportService;
-    }
+	public MonthlyReportController(MonthlyReportService reportService) {
+		this.reportService = reportService;
+	}
 
-    @GetMapping("/{userId}")
-    public ResponseEntity<MonthlyReportDTO> getMonthlyReport(@PathVariable Long userId, @RequestParam String month) {
-        return ResponseEntity.ok(reportService.getMonthlyReport(userId, YearMonth.parse(month)));
-    }
+	@GetMapping("/{userId}")
+	public ResponseEntity<MonthlyReportDTO> getMonthlyReport(@PathVariable Long userId, @RequestParam String month) {
+		return ResponseEntity.ok(reportService.getMonthlyReport(userId, YearMonth.parse(month)));
+	}
 }

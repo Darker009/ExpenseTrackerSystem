@@ -14,21 +14,21 @@ import java.time.YearMonth;
 @Service
 @Transactional
 public class MonthlyReportService {
-    private final MonthlyReportRepository reportRepository;
-    private final UserRepository userRepository;
+	private final MonthlyReportRepository reportRepository;
+	private final UserRepository userRepository;
 
-    public MonthlyReportService(MonthlyReportRepository reportRepository, UserRepository userRepository) {
-        this.reportRepository = reportRepository;
-        this.userRepository = userRepository;
-    }
+	public MonthlyReportService(MonthlyReportRepository reportRepository, UserRepository userRepository) {
+		this.reportRepository = reportRepository;
+		this.userRepository = userRepository;
+	}
 
-    public MonthlyReportDTO getMonthlyReport(Long userId, YearMonth month) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+	public MonthlyReportDTO getMonthlyReport(Long userId, YearMonth month) {
+		User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        MonthlyReport report = reportRepository.findByUserAndMonth(user, month)
-                .orElseThrow(() -> new ResourceNotFoundException("Report not found"));
+		MonthlyReport report = reportRepository.findByUserAndMonth(user, month)
+				.orElseThrow(() -> new ResourceNotFoundException("Report not found"));
 
-        return new MonthlyReportDTO(report.getId(), user.getId(), report.getMonth(), report.getTotalIncome(), report.getTotalExpense(), report.getRemainingBalance());
-    }
+		return new MonthlyReportDTO(report.getId(), user.getId(), report.getMonth(), report.getTotalIncome(),
+				report.getTotalExpense(), report.getRemainingBalance());
+	}
 }

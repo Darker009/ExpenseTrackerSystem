@@ -17,9 +17,9 @@ public class SecurityConfig {
         http
             .cors(cors -> cors.configure(http))
             .csrf(csrf -> csrf.disable())
-            .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())  // ✅ ALLOW ALL REQUESTS TEMPORARILY
+            .authorizeHttpRequests(auth -> auth.anyRequest().permitAll()) 
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .httpBasic(httpBasic -> httpBasic.disable());  // ✅ DISABLE AUTHENTICATION
+            .httpBasic(httpBasic -> httpBasic.disable());  
 
         return http.build();
     }

@@ -8,5 +8,5 @@ import java.time.YearMonth;
 import java.util.Optional;
 
 public interface MonthlyReportRepository extends JpaRepository<MonthlyReport, Long> {
-    Optional<MonthlyReport> findByUserAndMonth(User user, YearMonth month);
+	Optional<MonthlyReport> findByUserAndMonth(User user, YearMonth month);
 }

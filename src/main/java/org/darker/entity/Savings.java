@@ -7,112 +7,151 @@ import java.math.BigDecimal;
 @Table(name = "savings")
 public class Savings {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    @Column(nullable = false, precision = 15, scale = 2)
-    private BigDecimal totalBalance;
+	@Column(nullable = false, precision = 15, scale = 2)
+	private BigDecimal totalBalance;
 
-    @Column(nullable = false, precision = 15, scale = 2)
-    private BigDecimal remainingBalance;
+	@Column(nullable = false, precision = 15, scale = 2)
+	private BigDecimal remainingBalance;
 
-    @OneToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false, unique = true)
-    private User user;
+	@OneToOne
+	@JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false, unique = true)
+	private User user;
 
-    @Column(length = 15, unique = true, nullable = false)
-    private String phoneNumber;
+	@Column(length = 15, unique = true, nullable = false)
+	private String phoneNumber;
 
-    @Column(length = 20, unique = true, nullable = false)
-    private String accountNumber;
+	@Column(length = 20, unique = true, nullable = false)
+	private String accountNumber;
 
-    @Column(length = 10, unique = true, nullable = false)
-    private String panNumber;
+	@Column(length = 10, unique = true, nullable = false)
+	private String panNumber;
 
-    @Column(length = 12, unique = true, nullable = false)
-    private String aadhaarNumber;
+	@Column(length = 12, unique = true, nullable = false)
+	private String aadhaarNumber;
 
-    @Column(length = 255, nullable = false)
-    private String address;
+	@Column(length = 255, nullable = false)
+	private String address;
 
-    // ✅ Default Constructor
-    public Savings() {}
+	public Savings() {
+	}
 
-    // ✅ Constructor with Fields
-    public Savings(BigDecimal totalBalance, BigDecimal remainingBalance, User user,
-                   String phoneNumber, String accountNumber, String panNumber,
-                   String aadhaarNumber, String address) {
-        this.totalBalance = totalBalance;
-        this.remainingBalance = remainingBalance;
-        this.user = user;
-        this.phoneNumber = phoneNumber;
-        this.accountNumber = accountNumber;
-        this.panNumber = panNumber;
-        this.aadhaarNumber = aadhaarNumber;
-        this.address = address;
-    }
+	public Savings(BigDecimal totalBalance, BigDecimal remainingBalance, User user, String phoneNumber,
+			String accountNumber, String panNumber, String aadhaarNumber, String address) {
+		this.totalBalance = totalBalance;
+		this.remainingBalance = remainingBalance;
+		this.user = user;
+		this.phoneNumber = phoneNumber;
+		this.accountNumber = accountNumber;
+		this.panNumber = panNumber;
+		this.aadhaarNumber = aadhaarNumber;
+		this.address = address;
+	}
 
-    // ✅ Withdraw Funds Method (Modified)
-    public boolean withdrawFunds(BigDecimal amount) {
-        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("Withdrawal amount must be greater than zero.");
-        }
-        if (remainingBalance.compareTo(amount) >= 0) {
-            remainingBalance = remainingBalance.subtract(amount);
-            return true; // ✅ Successful withdrawal
-        } else {
-            return false; // ❌ Insufficient balance
-        }
-    }
+	public boolean withdrawFunds(BigDecimal amount) {
+		if (amount.compareTo(BigDecimal.ZERO) <= 0) {
+			throw new IllegalArgumentException("Withdrawal amount must be greater than zero.");
+		}
+		if (remainingBalance.compareTo(amount) >= 0) {
+			remainingBalance = remainingBalance.subtract(amount);
+			return true;
+		} else {
+			return false;
+		}
+	}
 
-    // ✅ Add Funds Method
-    public void addFunds(BigDecimal amount) {
-        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("Deposit amount must be greater than zero.");
-        }
-        totalBalance = totalBalance.add(amount);
-        remainingBalance = remainingBalance.add(amount);
-    }
+	public void addFunds(BigDecimal amount) {
+		if (amount.compareTo(BigDecimal.ZERO) <= 0) {
+			throw new IllegalArgumentException("Deposit amount must be greater than zero.");
+		}
+		totalBalance = totalBalance.add(amount);
+		remainingBalance = remainingBalance.add(amount);
+	}
 
-    // ✅ Deduct Expense Amount from Remaining Balance (New Method)
-    public boolean deductExpenseAmount(BigDecimal amount) {
-        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("Expense amount must be greater than zero.");
-        }
-        if (remainingBalance.compareTo(amount) >= 0) {
-            remainingBalance = remainingBalance.subtract(amount);
-            return true; // ✅ Successful deduction
-        } else {
-            return false; // ❌ Insufficient balance
-        }
-    }
+	public boolean deductExpenseAmount(BigDecimal amount) {
+		if (amount.compareTo(BigDecimal.ZERO) <= 0) {
+			throw new IllegalArgumentException("Expense amount must be greater than zero.");
+		}
+		if (remainingBalance.compareTo(amount) >= 0) {
+			remainingBalance = remainingBalance.subtract(amount);
+			return true;
+		} else {
+			return false;
+		}
+	}
 
-    // ✅ Getters and Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+	public Long getId() {
+		return id;
+	}
 
-    public BigDecimal getTotalBalance() { return totalBalance; }
-    public void setTotalBalance(BigDecimal totalBalance) { this.totalBalance = totalBalance; }
+	public void setId(Long id) {
+		this.id = id;
+	}
 
-    public BigDecimal getRemainingBalance() { return remainingBalance; }
-    public void setRemainingBalance(BigDecimal remainingBalance) { this.remainingBalance = remainingBalance; }
+	public BigDecimal getTotalBalance() {
+		return totalBalance;
+	}
 
-    public User getUser() { return user; }
-    public void setUser(User user) { this.user = user; }
+	public void setTotalBalance(BigDecimal totalBalance) {
+		this.totalBalance = totalBalance;
+	}
 
-    public String getPhoneNumber() { return phoneNumber; }
-    public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
+	public BigDecimal getRemainingBalance() {
+		return remainingBalance;
+	}
 
-    public String getAccountNumber() { return accountNumber; }
-    public void setAccountNumber(String accountNumber) { this.accountNumber = accountNumber; }
+	public void setRemainingBalance(BigDecimal remainingBalance) {
+		this.remainingBalance = remainingBalance;
+	}
 
-    public String getPanNumber() { return panNumber; }
-    public void setPanNumber(String panNumber) { this.panNumber = panNumber; }
+	public User getUser() {
+		return user;
+	}
 
-    public String getAadhaarNumber() { return aadhaarNumber; }
-    public void setAadhaarNumber(String aadhaarNumber) { this.aadhaarNumber = aadhaarNumber; }
+	public void setUser(User user) {
+		this.user = user;
+	}
 
-    public String getAddress() { return address; }
-    public void setAddress(String address) { this.address = address; }
+	public String getPhoneNumber() {
+		return phoneNumber;
+	}
+
+	public void setPhoneNumber(String phoneNumber) {
+		this.phoneNumber = phoneNumber;
+	}
+
+	public String getAccountNumber() {
+		return accountNumber;
+	}
+
+	public void setAccountNumber(String accountNumber) {
+		this.accountNumber = accountNumber;
+	}
+
+	public String getPanNumber() {
+		return panNumber;
+	}
+
+	public void setPanNumber(String panNumber) {
+		this.panNumber = panNumber;
+	}
+
+	public String getAadhaarNumber() {
+		return aadhaarNumber;
+	}
+
+	public void setAadhaarNumber(String aadhaarNumber) {
+		this.aadhaarNumber = aadhaarNumber;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
 }

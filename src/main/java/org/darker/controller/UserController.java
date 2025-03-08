@@ -20,7 +20,6 @@ public class UserController {
         this.userService = userService;
     }
 
-    // ✅ Register User
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody User user) {
         if (user.getEmail() == null || user.getPassword() == null) {
@@ -37,7 +36,6 @@ public class UserController {
         }
     }
 
-    // ✅ User Login
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@RequestBody User user) {
         if (user.getEmail() == null || user.getPassword() == null) {
@@ -54,7 +52,6 @@ public class UserController {
         }
     }
 
-    // ✅ Get User Details
     @GetMapping("/{id}")
     public ResponseEntity<?> getUserDetails(@PathVariable Long id) {
         try {
@@ -67,7 +64,6 @@ public class UserController {
         }
     }
 
-    // ✅ Update User
     @PutMapping("/{id}")
     public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody User userUpdates) {
         try {
@@ -80,7 +76,6 @@ public class UserController {
         }
     }
 
-    // ✅ Deactivate User
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deactivateUser(@PathVariable Long id) {
         try {

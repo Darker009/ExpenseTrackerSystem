@@ -16,7 +16,7 @@ public class SavingsDTO {
     private String aadhaarNumber;
     private String address;
 
-    // Constructor to convert Savings entity to SavingsDTO
+    
     public SavingsDTO(Savings savings) {
         this.id = savings.getId();
         this.totalBalance = savings.getTotalBalance();
@@ -29,7 +29,7 @@ public class SavingsDTO {
         this.address = savings.getAddress();
     }
 
-    // Getters and Setters
+    
     public Long getId() {
         return id;
     }

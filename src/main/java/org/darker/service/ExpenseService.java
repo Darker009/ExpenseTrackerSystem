@@ -20,90 +20,75 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class ExpenseService {
-    private final ExpenseRepository expenseRepository;
-    private final UserRepository userRepository;
-    private final SavingsRepository savingsRepository;
+	private final ExpenseRepository expenseRepository;
+	private final UserRepository userRepository;
+	private final SavingsRepository savingsRepository;
 
-    public ExpenseService(ExpenseRepository expenseRepository, UserRepository userRepository, SavingsRepository savingsRepository) {
-        this.expenseRepository = expenseRepository;
-        this.userRepository = userRepository;
-        this.savingsRepository = savingsRepository;
-    }
+	public ExpenseService(ExpenseRepository expenseRepository, UserRepository userRepository,
+			SavingsRepository savingsRepository) {
+		this.expenseRepository = expenseRepository;
+		this.userRepository = userRepository;
+		this.savingsRepository = savingsRepository;
+	}
 
-    // ✅ Add Expense
-    public ExpenseDTO addExpense(Long userId, Expense expense) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+	public ExpenseDTO addExpense(Long userId, Expense expense) {
+		User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        // Check if the user has a savings account
-        Savings savings = savingsRepository.findByUser(user)
-                .orElseThrow(() -> new ResourceNotFoundException("Savings account not found. Please create one first."));
+		Savings savings = savingsRepository.findByUser(user).orElseThrow(
+				() -> new ResourceNotFoundException("Savings account not found. Please create one first."));
 
-        // Deduct the expense amount from the user's savings
-        boolean isDeducted = savings.deductExpenseAmount(expense.getAmount());
-        if (!isDeducted) {
-            throw new InsufficientBalanceException("Insufficient funds to cover the expense.");
-        }
+		boolean isDeducted = savings.deductExpenseAmount(expense.getAmount());
+		if (!isDeducted) {
+			throw new InsufficientBalanceException("Insufficient funds to cover the expense.");
+		}
 
-        // Save the expense
-        Expense newExpense = new Expense(user, expense.getAmount(), expense.getCategory());
-        newExpense = expenseRepository.save(newExpense);
+		Expense newExpense = new Expense(user, expense.getAmount(), expense.getCategory());
+		newExpense = expenseRepository.save(newExpense);
 
-        // Return ExpenseDTO with updated remaining balance
-        return new ExpenseDTO(
-                newExpense.getId(),
-                user.getId(),
-                newExpense.getAmount(),
-                newExpense.getCategory(),
-                newExpense.getDate(),
-                savings.getRemainingBalance() // Include the updated remaining balance
-        );
-    }
+		return new ExpenseDTO(newExpense.getId(), user.getId(), newExpense.getAmount(), newExpense.getCategory(),
+				newExpense.getDate(), savings.getRemainingBalance());
+	}
 
-    // ✅ Get All Expenses for a User
-    public List<ExpenseDTO> getUserExpenses(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+	public List<ExpenseDTO> getUserExpenses(Long userId) {
+		User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        Savings savings = savingsRepository.findByUser(user)
-                .orElseThrow(() -> new ResourceNotFoundException("Savings account not found. Please create one first."));
+		Savings savings = savingsRepository.findByUser(user).orElseThrow(
+				() -> new ResourceNotFoundException("Savings account not found. Please create one first."));
 
-        return expenseRepository.findByUser(user).stream()
-                .map(expense -> new ExpenseDTO(expense.getId(), user.getId(), expense.getAmount(), expense.getCategory(), expense.getDate(), savings.getRemainingBalance()))
-                .collect(Collectors.toList());
-    }
+		return expenseRepository.findByUser(user).stream()
+				.map(expense -> new ExpenseDTO(expense.getId(), user.getId(), expense.getAmount(),
+						expense.getCategory(), expense.getDate(), savings.getRemainingBalance()))
+				.collect(Collectors.toList());
+	}
 
-    // ✅ Get Expenses by Category
-    public List<ExpenseDTO> getUserExpensesByCategory(Long userId, ExpenseCategory category) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+	public List<ExpenseDTO> getUserExpensesByCategory(Long userId, ExpenseCategory category) {
+		User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        Savings savings = savingsRepository.findByUser(user)
-                .orElseThrow(() -> new ResourceNotFoundException("Savings account not found. Please create one first."));
+		Savings savings = savingsRepository.findByUser(user).orElseThrow(
+				() -> new ResourceNotFoundException("Savings account not found. Please create one first."));
 
-        return expenseRepository.findByUserAndCategory(user, category).stream()
-                .map(expense -> new ExpenseDTO(expense.getId(), user.getId(), expense.getAmount(), expense.getCategory(), expense.getDate(), savings.getRemainingBalance()))
-                .collect(Collectors.toList());
-    }
+		return expenseRepository.findByUserAndCategory(user, category).stream()
+				.map(expense -> new ExpenseDTO(expense.getId(), user.getId(), expense.getAmount(),
+						expense.getCategory(), expense.getDate(), savings.getRemainingBalance()))
+				.collect(Collectors.toList());
+	}
 
-    // ✅ Get Expenses by Date Range
-    public List<ExpenseDTO> getUserExpensesByDateRange(Long userId, LocalDate startDate, LocalDate endDate) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+	public List<ExpenseDTO> getUserExpensesByDateRange(Long userId, LocalDate startDate, LocalDate endDate) {
+		User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        Savings savings = savingsRepository.findByUser(user)
-                .orElseThrow(() -> new ResourceNotFoundException("Savings account not found. Please create one first."));
+		Savings savings = savingsRepository.findByUser(user).orElseThrow(
+				() -> new ResourceNotFoundException("Savings account not found. Please create one first."));
 
-        return expenseRepository.findByUserAndDateBetween(user, startDate, endDate).stream()
-                .map(expense -> new ExpenseDTO(expense.getId(), user.getId(), expense.getAmount(), expense.getCategory(), expense.getDate(), savings.getRemainingBalance()))
-                .collect(Collectors.toList());
-    }
+		return expenseRepository.findByUserAndDateBetween(user, startDate, endDate).stream()
+				.map(expense -> new ExpenseDTO(expense.getId(), user.getId(), expense.getAmount(),
+						expense.getCategory(), expense.getDate(), savings.getRemainingBalance()))
+				.collect(Collectors.toList());
+	}
 
-    // ✅ Delete an Expense
-    public void deleteExpense(Long id) {
-        if (!expenseRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Expense not found");
-        }
-        expenseRepository.deleteById(id);
-    }
+	public void deleteExpense(Long id) {
+		if (!expenseRepository.existsById(id)) {
+			throw new ResourceNotFoundException("Expense not found");
+		}
+		expenseRepository.deleteById(id);
+	}
 }

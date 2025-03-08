@@ -1,43 +1,41 @@
 package org.darker.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.time.LocalDateTime;
 
 public class UserDTO {
     private String name;
     private String email;
-    
-    @JsonIgnore
-    private String password;
+    private LocalDateTime registeredAt;
 
+    // Default Constructor
     public UserDTO() {}
 
-    public UserDTO(String name, String email, String password) {
+    // Parameterized Constructor
+    public UserDTO(String name, String email, LocalDateTime registeredAt) {
         this.name = name;
         this.email = email;
-        this.password = password;
+        this.registeredAt = registeredAt;
     }
 
-    public String getName() {
-        return name;
+    // Getters and Setters
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+
+    public LocalDateTime getRegisteredAt() { return registeredAt; }
+    public void setRegisteredAt(LocalDateTime registeredAt) { this.registeredAt = registeredAt; }
+
+    // toString method (Optional but useful)
+    @Override
+    public String toString() {
+        return "UserDTO{" +
+                "name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", registeredAt=" + registeredAt +
+                '}';
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
+    
 }

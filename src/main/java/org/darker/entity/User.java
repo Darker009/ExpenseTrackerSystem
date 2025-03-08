@@ -1,6 +1,7 @@
 package org.darker.entity;
 
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "users")
@@ -19,16 +20,25 @@ public class User {
     private String password;
 
     @Column(nullable = false)
-    private boolean active = true; // Account is active by default
+    private boolean active = true;
+
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime registeredAt;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Savings savings;
 
     // Constructors
-    public User() {}
+    public User() {
+        this.registeredAt = LocalDateTime.now();  // Ensure registeredAt is set by default
+    }
 
     public User(String name, String email, String password) {
         this.name = name;
         this.email = email;
-        this.password = password;  // Password will be encoded in Service layer
+        this.password = password;
         this.active = true;
+        this.registeredAt = LocalDateTime.now();  // Set registeredAt to now
     }
 
     // Getters and Setters
@@ -46,4 +56,10 @@ public class User {
 
     public boolean isActive() { return active; }
     public void setActive(boolean active) { this.active = active; }
+
+    public LocalDateTime getRegisteredAt() { return registeredAt; }
+    public void setRegisteredAt(LocalDateTime registeredAt) { this.registeredAt = registeredAt; }
+
+    public Savings getSavings() { return savings; }
+    public void setSavings(Savings savings) { this.savings = savings; }
 }

@@ -1,12 +1,15 @@
 package org.darker.service;
 
 import jakarta.transaction.Transactional;
-import java.util.Optional;
+import org.darker.dto.UserDTO;
 import org.darker.entity.User;
-import org.darker.exception.ResourceNotFoundException;
+import org.darker.entity.Savings;
+import org.darker.exception.ResourceNotFoundException; // Existing exception
 import org.darker.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 
 @Service
 @Transactional
@@ -19,16 +22,23 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    // ✅ Register User
     public void registerUser(User user) {
-        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
-            throw new IllegalArgumentException("Email already registered");
-        }
+        // Check if email already exists
+        userRepository.findByEmail(user.getEmail())
+                .ifPresent(existingUser -> {
+                    throw new ResourceNotFoundException("Email already registered");
+                });
+
+        // Encoding password before saving
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setActive(true); // Ensure the user is active after registration
+        user.setActive(true);
+        user.setRegisteredAt(LocalDateTime.now()); // Ensure registeredAt is set at the time of registration
         userRepository.save(user);
     }
 
-    public User loginUser(String email, String password) {
+    // ✅ User Login
+    public UserDTO loginUser(String email, String password) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Invalid email or password"));
 
@@ -36,34 +46,61 @@ public class UserService {
             throw new ResourceNotFoundException("Account is deactivated. Please contact support.");
         }
 
+        // Verify password with encoded value
         if (passwordEncoder.matches(password, user.getPassword())) {
-            return user;
+            return new UserDTO(user.getName(), user.getEmail(), user.getRegisteredAt());
         }
+
         throw new ResourceNotFoundException("Invalid email or password");
     }
 
-    public User getUserDetails(Long id) {
-        return userRepository.findById(id)
+    // ✅ Get User Details
+    public UserDTO getUserDetails(Long id) {
+        User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        return new UserDTO(user.getName(), user.getEmail(), user.getRegisteredAt());
     }
 
-    public User updateUser(Long id, User userUpdates) {
-        User user = getUserDetails(id);
+    // ✅ Update User Details
+    public UserDTO updateUser(Long id, User userUpdates) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
         if (!user.isActive()) {
             throw new ResourceNotFoundException("User is deactivated. Cannot update.");
         }
 
-        if (userUpdates.getName() != null) user.setName(userUpdates.getName());
+        // Update user properties
+        if (userUpdates.getName() != null && !userUpdates.getName().isEmpty()) {
+            user.setName(userUpdates.getName());
+        }
         if (userUpdates.getPassword() != null && !userUpdates.getPassword().isEmpty()) {
-            user.setPassword(passwordEncoder.encode(userUpdates.getPassword()));
+            user.setPassword(passwordEncoder.encode(userUpdates.getPassword())); // Re-encode the password
         }
 
-        return userRepository.save(user);
+        userRepository.save(user);
+        return new UserDTO(user.getName(), user.getEmail(), user.getRegisteredAt());
     }
-    
+
+    // ✅ Deactivate User
     public void deactivateUser(Long id) {
-        User user = getUserDetails(id);
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         user.setActive(false);
         userRepository.save(user);
+    }
+
+    // ✅ Ensure that the user has a savings account before deducting from savings
+    public boolean hasSavingsAccount(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        // Check if the user has a savings account linked
+        Savings savings = user.getSavings();
+        if (savings == null) {
+            throw new ResourceNotFoundException("User does not have a savings account.");
+        }
+
+        return true; // User has a savings account
     }
 }

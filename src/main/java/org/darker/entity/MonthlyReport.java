@@ -1,7 +1,8 @@
 package org.darker.entity;
 
 import jakarta.persistence.*;
-import java.time.YearMonth;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "monthly_reports")
@@ -11,32 +12,33 @@ public class MonthlyReport {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(nullable = false)
-	private YearMonth month; 
-
-	@Column(nullable = false)
-	private double totalIncome;
-
-	@Column(nullable = false)
-	private double totalExpense;
-
-	@Column(nullable = false)
-	private double remainingBalance;
-
 	@ManyToOne
-	@JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
+	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
 
-	// Constructor
+	@Column(nullable = false)
+	private LocalDate month;
+
+	@Column(nullable = false, precision = 15, scale = 2)
+	private BigDecimal totalIncome;
+
+	@Column(nullable = false, precision = 15, scale = 2)
+	private BigDecimal totalExpense;
+
+	@Column(nullable = false, precision = 15, scale = 2)
+	private BigDecimal remainingBalance;
+
 	public MonthlyReport() {
 	}
 
-	public MonthlyReport(YearMonth month, double totalIncome, double totalExpense, double remainingBalance, User user) {
-		this.month = month;
+	
+	public MonthlyReport(User user, LocalDate month, BigDecimal totalIncome, BigDecimal totalExpense,
+			BigDecimal remainingBalance) {
+		this.user = user;
+		this.month = month.withDayOfMonth(1); 
 		this.totalIncome = totalIncome;
 		this.totalExpense = totalExpense;
 		this.remainingBalance = remainingBalance;
-		this.user = user;
 	}
 
 	public Long getId() {
@@ -47,43 +49,43 @@ public class MonthlyReport {
 		this.id = id;
 	}
 
-	public YearMonth getMonth() {
-		return month;
-	}
-
-	public void setMonth(YearMonth month) {
-		this.month = month;
-	}
-
-	public double getTotalIncome() {
-		return totalIncome;
-	}
-
-	public void setTotalIncome(double totalIncome) {
-		this.totalIncome = totalIncome;
-	}
-
-	public double getTotalExpense() {
-		return totalExpense;
-	}
-
-	public void setTotalExpense(double totalExpense) {
-		this.totalExpense = totalExpense;
-	}
-
-	public double getRemainingBalance() {
-		return remainingBalance;
-	}
-
-	public void setRemainingBalance(double remainingBalance) {
-		this.remainingBalance = remainingBalance;
-	}
-
 	public User getUser() {
 		return user;
 	}
 
 	public void setUser(User user) {
 		this.user = user;
+	}
+
+	public LocalDate getMonth() {
+		return month;
+	}
+
+	public void setMonth(LocalDate month) {
+		this.month = month.withDayOfMonth(1); 
+	}
+
+	public BigDecimal getTotalIncome() {
+		return totalIncome;
+	}
+
+	public void setTotalIncome(BigDecimal totalIncome) {
+		this.totalIncome = totalIncome;
+	}
+
+	public BigDecimal getTotalExpense() {
+		return totalExpense;
+	}
+
+	public void setTotalExpense(BigDecimal totalExpense) {
+		this.totalExpense = totalExpense;
+	}
+
+	public BigDecimal getRemainingBalance() {
+		return remainingBalance;
+	}
+
+	public void setRemainingBalance(BigDecimal remainingBalance) {
+		this.remainingBalance = remainingBalance;
 	}
 }

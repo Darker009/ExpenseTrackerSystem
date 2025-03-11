@@ -32,7 +32,7 @@ public class ExpenseController {
 	@PostMapping("/{userId}")
 	public ResponseEntity<ExpenseDTO> addExpense(@PathVariable Long userId, @RequestBody Expense expense) {
 		if (!userHasSavingsAccount(userId)) {
-			return ResponseEntity.badRequest().body(new ExpenseDTO(null, userId, null, null, null, null));
+			return ResponseEntity.badRequest().body(new ExpenseDTO(null, userId, null, null, null, null, null));
 		}
 		ExpenseDTO dto = expenseService.addExpense(userId, expense);
 		return ResponseEntity.ok(dto);

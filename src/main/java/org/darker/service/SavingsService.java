@@ -30,25 +30,22 @@ public class SavingsService {
 	}
 
 	public Savings getUserSavings(Long userId) {
-		return savingsRepository.findByUserId(userId).orElseThrow(
+		User user = getUserById(userId);
+		return savingsRepository.findByUser(user).orElseThrow(
 				() -> new ResourceNotFoundException("Savings account not found for user with id: " + userId));
 	}
 
 	public Savings depositFunds(Long userId, BigDecimal amount) {
 		Savings savings = getUserSavings(userId);
-
 		savings.addFunds(amount);
-
 		return savingsRepository.save(savings);
 	}
 
 	public Savings withdrawFunds(Long userId, BigDecimal amount) {
 		Savings savings = getUserSavings(userId);
-
 		if (!savings.withdrawFunds(amount)) {
 			throw new InsufficientBalanceException("Insufficient balance to withdraw the amount of " + amount + ".");
 		}
-
 		return savingsRepository.save(savings);
 	}
 }

@@ -1,25 +1,34 @@
 package org.darker.dto;
 
-import java.time.YearMonth;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.Map;
 
 public class MonthlyReportDTO {
-    private Long id;
-    private Long userId;
-    private YearMonth month;
-    private double totalIncome;
-    private double totalExpense;
-    private double remainingBalance;
+	private Long id;
+	private Long userId;
+	private LocalDate month;
+	private BigDecimal totalIncome;
+	private BigDecimal totalExpense;
+	private BigDecimal remainingBalance;
+	private Map<String, BigDecimal> expenseBreakdown;
 
-    public MonthlyReportDTO(Long id, Long userId, YearMonth month, double totalIncome, double totalExpense, double remainingBalance) {
-        this.id = id;
-        this.userId = userId;
-        this.month = month;
-        this.totalIncome = totalIncome;
-        this.totalExpense = totalExpense;
-        this.remainingBalance = remainingBalance;
-    }
-    public MonthlyReportDTO() {}
-    
+	public MonthlyReportDTO() {
+	}
+
+	public MonthlyReportDTO(Long id, Long userId, LocalDate month, BigDecimal totalIncome, BigDecimal totalExpense,
+			BigDecimal remainingBalance, Map<String, BigDecimal> expenseBreakdown) {
+		this.id = id;
+		this.userId = userId;
+		this.month = month;
+		this.totalIncome = totalIncome;
+		this.totalExpense = totalExpense;
+		this.remainingBalance = remainingBalance;
+		this.expenseBreakdown = expenseBreakdown;
+	}
+
+	// Getters and Setters
+
 	public Long getId() {
 		return id;
 	}
@@ -36,37 +45,43 @@ public class MonthlyReportDTO {
 		this.userId = userId;
 	}
 
-	public YearMonth getMonth() {
+	public LocalDate getMonth() {
 		return month;
 	}
 
-	public void setMonth(YearMonth month) {
+	public void setMonth(LocalDate month) {
 		this.month = month;
 	}
 
-	public double getTotalIncome() {
+	public BigDecimal getTotalIncome() {
 		return totalIncome;
 	}
 
-	public void setTotalIncome(double totalIncome) {
+	public void setTotalIncome(BigDecimal totalIncome) {
 		this.totalIncome = totalIncome;
 	}
 
-	public double getTotalExpense() {
+	public BigDecimal getTotalExpense() {
 		return totalExpense;
 	}
 
-	public void setTotalExpense(double totalExpense) {
+	public void setTotalExpense(BigDecimal totalExpense) {
 		this.totalExpense = totalExpense;
 	}
 
-	public double getRemainingBalance() {
+	public BigDecimal getRemainingBalance() {
 		return remainingBalance;
 	}
 
-	public void setRemainingBalance(double remainingBalance) {
+	public void setRemainingBalance(BigDecimal remainingBalance) {
 		this.remainingBalance = remainingBalance;
 	}
 
-   
+	public Map<String, BigDecimal> getExpenseBreakdown() {
+		return expenseBreakdown;
+	}
+
+	public void setExpenseBreakdown(Map<String, BigDecimal> expenseBreakdown) {
+		this.expenseBreakdown = expenseBreakdown;
+	}
 }

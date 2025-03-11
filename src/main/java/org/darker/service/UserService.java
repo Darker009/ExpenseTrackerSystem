@@ -24,7 +24,7 @@ public class UserService {
 
 	public void registerUser(User user) {
 		userRepository.findByEmail(user.getEmail()).ifPresent(existingUser -> {
-			throw new ResourceNotFoundException("Email already registered");
+			throw new IllegalArgumentException("Email already registered");
 		});
 
 		user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -64,6 +64,9 @@ public class UserService {
 			user.setName(userUpdates.getName());
 		}
 		if (userUpdates.getPassword() != null && !userUpdates.getPassword().isEmpty()) {
+			if (userUpdates.getPassword().length() < 6) {
+				throw new IllegalArgumentException("Password must be at least 6 characters long.");
+			}
 			user.setPassword(passwordEncoder.encode(userUpdates.getPassword()));
 		}
 

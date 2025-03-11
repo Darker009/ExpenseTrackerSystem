@@ -2,6 +2,7 @@ package org.darker.entity;
 
 import jakarta.persistence.*;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "savings")
@@ -36,11 +37,14 @@ public class Savings {
 	@Column(length = 255, nullable = false)
 	private String address;
 
+	@Column(nullable = false)
+	private LocalDate date;
+
 	public Savings() {
 	}
 
 	public Savings(BigDecimal totalBalance, BigDecimal remainingBalance, User user, String phoneNumber,
-			String accountNumber, String panNumber, String aadhaarNumber, String address) {
+			String accountNumber, String panNumber, String aadhaarNumber, String address, LocalDate date) {
 		this.totalBalance = totalBalance;
 		this.remainingBalance = remainingBalance;
 		this.user = user;
@@ -49,6 +53,7 @@ public class Savings {
 		this.panNumber = panNumber;
 		this.aadhaarNumber = aadhaarNumber;
 		this.address = address;
+		this.date = date;
 	}
 
 	public boolean withdrawFunds(BigDecimal amount) {
@@ -153,5 +158,13 @@ public class Savings {
 
 	public void setAddress(String address) {
 		this.address = address;
+	}
+
+	public LocalDate getDate() {
+		return date;
+	}
+
+	public void setDate(LocalDate date) {
+		this.date = date;
 	}
 }

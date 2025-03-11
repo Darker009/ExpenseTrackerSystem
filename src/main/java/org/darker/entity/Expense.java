@@ -26,13 +26,17 @@ public class Expense {
 	@Column(nullable = false, updatable = false)
 	private LocalDate date;
 
+	@Column(nullable = true)
+	private String description;
+
 	public Expense() {
 	}
 
-	public Expense(User user, BigDecimal amount, ExpenseCategory category) {
+	public Expense(User user, BigDecimal amount, ExpenseCategory category, String description) {
 		this.user = user;
 		this.amount = amount;
 		this.category = category;
+		this.description = description;
 		this.date = LocalDate.now();
 	}
 
@@ -40,45 +44,47 @@ public class Expense {
 		return id;
 	}
 
-	public void setId(Long id) {
-		this.id = id;
-	}
-
 	public User getUser() {
 		return user;
-	}
-
-	public void setUser(User user) {
-		this.user = user;
 	}
 
 	public BigDecimal getAmount() {
 		return amount;
 	}
 
-	public void setAmount(BigDecimal amount) {
-		this.amount = amount;
-	}
-
 	public ExpenseCategory getCategory() {
 		return category;
-	}
-
-	public void setCategory(ExpenseCategory category) {
-		this.category = category;
 	}
 
 	public LocalDate getDate() {
 		return date;
 	}
 
+	public String getDescription() {
+		return description;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+
+	public void setAmount(BigDecimal amount) {
+		this.amount = amount;
+	}
+
+	public void setCategory(ExpenseCategory category) {
+		this.category = category;
+	}
+
 	public void setDate(LocalDate date) {
 		this.date = date;
 	}
 
-	public void deductFromSavings() {
-		BigDecimal currentBalance = user.getSavings().getRemainingBalance(); 
-		BigDecimal updatedBalance = currentBalance.subtract(amount); 
-		user.getSavings().setRemainingBalance(updatedBalance); 
+	public void setDescription(String description) {
+		this.description = description;
 	}
 }

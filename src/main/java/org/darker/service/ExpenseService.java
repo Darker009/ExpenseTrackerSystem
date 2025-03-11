@@ -7,7 +7,7 @@ import org.darker.entity.Savings;
 import org.darker.entity.User;
 import org.darker.enums.ExpenseCategory;
 import org.darker.exception.ResourceNotFoundException;
-import org.darker.exception.InsufficientBalanceException; // Custom exception for insufficient funds
+import org.darker.exception.InsufficientBalanceException;
 import org.darker.repository.ExpenseRepository;
 import org.darker.repository.SavingsRepository;
 import org.darker.repository.UserRepository;
@@ -37,16 +37,16 @@ public class ExpenseService {
 		Savings savings = savingsRepository.findByUser(user).orElseThrow(
 				() -> new ResourceNotFoundException("Savings account not found. Please create one first."));
 
-		boolean isDeducted = savings.deductExpenseAmount(expense.getAmount());
+		boolean isDeducted = savings.withdrawFunds(expense.getAmount()); // ✅ Use withdrawFunds()
 		if (!isDeducted) {
 			throw new InsufficientBalanceException("Insufficient funds to cover the expense.");
 		}
 
-		Expense newExpense = new Expense(user, expense.getAmount(), expense.getCategory());
+		Expense newExpense = new Expense(user, expense.getAmount(), expense.getCategory(), expense.getDescription());
 		newExpense = expenseRepository.save(newExpense);
 
 		return new ExpenseDTO(newExpense.getId(), user.getId(), newExpense.getAmount(), newExpense.getCategory(),
-				newExpense.getDate(), savings.getRemainingBalance());
+				newExpense.getDate(), savings.getRemainingBalance(), newExpense.getDescription());
 	}
 
 	public List<ExpenseDTO> getUserExpenses(Long userId) {
@@ -57,7 +57,8 @@ public class ExpenseService {
 
 		return expenseRepository.findByUser(user).stream()
 				.map(expense -> new ExpenseDTO(expense.getId(), user.getId(), expense.getAmount(),
-						expense.getCategory(), expense.getDate(), savings.getRemainingBalance()))
+						expense.getCategory(), expense.getDate(), savings.getRemainingBalance(),
+						expense.getDescription()))
 				.collect(Collectors.toList());
 	}
 
@@ -69,7 +70,8 @@ public class ExpenseService {
 
 		return expenseRepository.findByUserAndCategory(user, category).stream()
 				.map(expense -> new ExpenseDTO(expense.getId(), user.getId(), expense.getAmount(),
-						expense.getCategory(), expense.getDate(), savings.getRemainingBalance()))
+						expense.getCategory(), expense.getDate(), savings.getRemainingBalance(),
+						expense.getDescription()))
 				.collect(Collectors.toList());
 	}
 
@@ -81,14 +83,22 @@ public class ExpenseService {
 
 		return expenseRepository.findByUserAndDateBetween(user, startDate, endDate).stream()
 				.map(expense -> new ExpenseDTO(expense.getId(), user.getId(), expense.getAmount(),
-						expense.getCategory(), expense.getDate(), savings.getRemainingBalance()))
+						expense.getCategory(), expense.getDate(), savings.getRemainingBalance(),
+						expense.getDescription()))
 				.collect(Collectors.toList());
 	}
 
+	@Transactional
 	public void deleteExpense(Long id) {
-		if (!expenseRepository.existsById(id)) {
-			throw new ResourceNotFoundException("Expense not found");
-		}
+		Expense expense = expenseRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Expense not found"));
+
+		Savings savings = savingsRepository.findByUser(expense.getUser())
+				.orElseThrow(() -> new ResourceNotFoundException("Savings not found"));
+
+		savings.addFunds(expense.getAmount()); // ✅ Correct balance update
+		savingsRepository.save(savings);
+
 		expenseRepository.deleteById(id);
 	}
 }

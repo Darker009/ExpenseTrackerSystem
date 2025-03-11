@@ -1,6 +1,7 @@
 package org.darker.controller;
 
 import org.darker.dto.SavingsDTO;
+import org.darker.dto.SavingsLimitedDTO;
 import org.darker.exception.InsufficientBalanceException;
 import org.darker.exception.ResourceNotFoundException;
 import org.darker.service.SavingsService;
@@ -11,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.Map;
 
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
@@ -23,7 +26,8 @@ public class SavingsController {
 	}
 
 	@PostMapping("/register/{userId}")
-	public ResponseEntity<SavingsDTO> registerSavings(@PathVariable Long userId, @RequestBody Savings savingsRequest) {
+	public ResponseEntity<SavingsDTO> registerSavings(@PathVariable Long userId,
+			@RequestBody SavingsDTO savingsRequest) {
 		try {
 			User user = savingsService.getUserById(userId);
 			if (user == null) {
@@ -32,19 +36,19 @@ public class SavingsController {
 
 			Savings savings = new Savings();
 			savings.setUser(user);
-			savings.setPhoneNumber(savingsRequest.getPhoneNumber());
-			savings.setAccountNumber(savingsRequest.getAccountNumber());
-			savings.setPanNumber(savingsRequest.getPanNumber());
-			savings.setAadhaarNumber(savingsRequest.getAadhaarNumber());
-			savings.setAddress(savingsRequest.getAddress());
-
 			BigDecimal initialBalance = savingsRequest.getTotalBalance() != null ? savingsRequest.getTotalBalance()
 					: BigDecimal.ZERO;
 			savings.setTotalBalance(initialBalance);
 			savings.setRemainingBalance(initialBalance);
 
-			Savings savedSavings = savingsService.saveSavings(savings);
+			savings.setAadhaarNumber(savingsRequest.getAadhaarNumber());
+			savings.setAccountNumber(savingsRequest.getAccountNumber());
+			savings.setPanNumber(savingsRequest.getPanNumber());
+			savings.setPhoneNumber(savingsRequest.getPhoneNumber());
+			savings.setAddress(savingsRequest.getAddress());
+			savings.setDate(LocalDate.now());
 
+			Savings savedSavings = savingsService.saveSavings(savings);
 			return ResponseEntity.status(HttpStatus.CREATED).body(new SavingsDTO(savedSavings));
 
 		} catch (Exception e) {
@@ -53,36 +57,48 @@ public class SavingsController {
 	}
 
 	@GetMapping("/{userId}")
-	public ResponseEntity<SavingsDTO> getUserSavings(@PathVariable Long userId) {
+	public ResponseEntity<SavingsLimitedDTO> getUserSavings(@PathVariable Long userId) {
 		try {
 			Savings savings = savingsService.getUserSavings(userId);
-			return ResponseEntity.ok(new SavingsDTO(savings));
+			SavingsLimitedDTO response = new SavingsLimitedDTO(savings.getId(), savings.getUser().getId(),
+					savings.getRemainingBalance());
+			return ResponseEntity.ok(response);
 		} catch (ResourceNotFoundException e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 		}
 	}
 
 	@PostMapping("/{userId}/deposit")
-	public ResponseEntity<SavingsDTO> depositFunds(@PathVariable Long userId, @RequestParam BigDecimal amount) {
+	public ResponseEntity<SavingsLimitedDTO> depositFunds(@PathVariable Long userId,
+			@RequestBody Map<String, BigDecimal> request) {
+		BigDecimal amount = request.get("amount");
 		validateAmount(amount, "Deposit amount must be greater than zero.");
 		try {
 			Savings savings = savingsService.depositFunds(userId, amount);
-			return ResponseEntity.ok(new SavingsDTO(savings));
+
+			SavingsLimitedDTO response = new SavingsLimitedDTO(savings.getId(), savings.getUser().getId(),
+					savings.getRemainingBalance());
+			return ResponseEntity.ok(response);
 		} catch (ResourceNotFoundException e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 		}
 	}
 
 	@PostMapping("/{userId}/withdraw")
-	public ResponseEntity<SavingsDTO> withdrawFunds(@PathVariable Long userId, @RequestParam BigDecimal amount) {
+	public ResponseEntity<SavingsLimitedDTO> withdrawFunds(@PathVariable Long userId,
+			@RequestBody Map<String, BigDecimal> request) {
+		BigDecimal amount = request.get("amount");
 		validateAmount(amount, "Withdrawal amount must be greater than zero.");
 		try {
 			Savings savings = savingsService.withdrawFunds(userId, amount);
-			return ResponseEntity.ok(new SavingsDTO(savings));
+			SavingsLimitedDTO response = new SavingsLimitedDTO(savings.getId(), savings.getUser().getId(),
+					savings.getRemainingBalance());
+
+			return ResponseEntity.ok(response);
 		} catch (ResourceNotFoundException e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 		} catch (InsufficientBalanceException e) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null); 
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
 		}
 	}
 

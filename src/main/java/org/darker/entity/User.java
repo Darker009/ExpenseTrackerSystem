@@ -28,9 +28,8 @@ public class User {
 	@OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private Savings savings;
 
-	
 	public User() {
-		this.registeredAt = LocalDateTime.now(); 
+		this.registeredAt = LocalDateTime.now();
 	}
 
 	public User(String name, String email, String password) {
@@ -38,7 +37,7 @@ public class User {
 		this.email = email;
 		this.password = password;
 		this.active = true;
-		this.registeredAt = LocalDateTime.now(); 
+		this.registeredAt = LocalDateTime.now();
 	}
 
 	public Long getId() {

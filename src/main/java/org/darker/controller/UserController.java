@@ -14,77 +14,82 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
-    private final UserService userService;
+	private final UserService userService;
 
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
+	public UserController(UserService userService) {
+		this.userService = userService;
+	}
 
-    @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestBody User user) {
-        if (user.getEmail() == null || user.getPassword() == null) {
-            return ResponseEntity.badRequest().body(Map.of("message", "Email and password are required."));
-        }
+	@PostMapping("/register")
+	public ResponseEntity<?> registerUser(@RequestBody User user) {
+		if (user.getEmail() == null || user.getPassword() == null) {
+			return ResponseEntity.badRequest().body(Map.of("message", "Email and password are required."));
+		}
 
-        try {
-            userService.registerUser(user);
-            return ResponseEntity.ok(Map.of("message", "User registered successfully"));
-        } catch (ResourceNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", e.getMessage()));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "An unexpected error occurred"));
-        }
-    }
+		try {
+			userService.registerUser(user);
+			return ResponseEntity.ok(Map.of("message", "User registered successfully"));
+		} catch (ResourceNotFoundException e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", e.getMessage()));
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body(Map.of("message", "An unexpected error occurred"));
+		}
+	}
 
-    @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@RequestBody User user) {
-        if (user.getEmail() == null || user.getPassword() == null) {
-            return ResponseEntity.badRequest().body(Map.of("message", "Email and password are required."));
-        }
+	@PostMapping("/login")
+	public ResponseEntity<?> loginUser(@RequestBody User user) {
+		if (user.getEmail() == null || user.getPassword() == null) {
+			return ResponseEntity.badRequest().body(Map.of("message", "Email and password are required."));
+		}
 
-        try {
-            UserDTO userDTO = userService.loginUser(user.getEmail(), user.getPassword());
-            return ResponseEntity.ok(userDTO);
-        } catch (ResourceNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", e.getMessage()));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "An unexpected error occurred"));
-        }
-    }
+		try {
+			UserDTO userDTO = userService.loginUser(user.getEmail(), user.getPassword());
+			return ResponseEntity.ok(userDTO);
+		} catch (ResourceNotFoundException e) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", e.getMessage()));
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body(Map.of("message", "An unexpected error occurred"));
+		}
+	}
 
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getUserDetails(@PathVariable Long id) {
-        try {
-            UserDTO user = userService.getUserDetails(id);
-            return ResponseEntity.ok(user);
-        } catch (ResourceNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", e.getMessage()));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "An unexpected error occurred"));
-        }
-    }
+	@GetMapping("/{id}")
+	public ResponseEntity<?> getUserDetails(@PathVariable Long id) {
+		try {
+			UserDTO user = userService.getUserDetails(id);
+			return ResponseEntity.ok(user);
+		} catch (ResourceNotFoundException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", e.getMessage()));
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body(Map.of("message", "An unexpected error occurred"));
+		}
+	}
 
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody User userUpdates) {
-        try {
-            UserDTO updatedUser = userService.updateUser(id, userUpdates);
-            return ResponseEntity.ok(updatedUser);
-        } catch (ResourceNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", e.getMessage()));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "An unexpected error occurred"));
-        }
-    }
+	@PutMapping("/{id}")
+	public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody User userUpdates) {
+		try {
+			UserDTO updatedUser = userService.updateUser(id, userUpdates);
+			return ResponseEntity.ok(updatedUser);
+		} catch (ResourceNotFoundException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", e.getMessage()));
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body(Map.of("message", "An unexpected error occurred"));
+		}
+	}
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deactivateUser(@PathVariable Long id) {
-        try {
-            userService.deactivateUser(id);
-            return ResponseEntity.ok(Map.of("message", "User deactivated successfully"));
-        } catch (ResourceNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", e.getMessage()));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "An unexpected error occurred"));
-        }
-    }
+	@DeleteMapping("/{id}")
+	public ResponseEntity<?> deactivateUser(@PathVariable Long id) {
+		try {
+			userService.deactivateUser(id);
+			return ResponseEntity.ok(Map.of("message", "User deactivated successfully"));
+		} catch (ResourceNotFoundException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", e.getMessage()));
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body(Map.of("message", "An unexpected error occurred"));
+		}
+	}
 }

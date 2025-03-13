@@ -20,6 +20,7 @@ public class MonthlyReportController {
 		this.reportService = reportService;
 	}
 
+	// user's monthly report.
 	@GetMapping("/{userId}") 
 	public ResponseEntity<?> getMonthlyReport(@PathVariable Long userId, @RequestParam String month) {
 		if (month == null || month.isBlank()) {

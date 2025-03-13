@@ -25,6 +25,7 @@ public class SavingsController {
 		this.savingsService = savingsService;
 	}
 
+	//user can create saving account with(aadharNo, panNo, address, balance, accountNo, phoneNo etc.)
 	@PostMapping("/register/{userId}")
 	public ResponseEntity<SavingsDTO> registerSavings(@PathVariable Long userId,
 			@RequestBody SavingsDTO savingsRequest) {
@@ -56,6 +57,7 @@ public class SavingsController {
 		}
 	}
 
+	//user can check his balance.
 	@GetMapping("/{userId}")
 	public ResponseEntity<SavingsLimitedDTO> getUserSavings(@PathVariable Long userId) {
 		try {
@@ -68,6 +70,7 @@ public class SavingsController {
 		}
 	}
 
+	//user can deposit cash 
 	@PostMapping("/{userId}/deposit")
 	public ResponseEntity<SavingsLimitedDTO> depositFunds(@PathVariable Long userId,
 			@RequestBody Map<String, BigDecimal> request) {
@@ -84,6 +87,7 @@ public class SavingsController {
 		}
 	}
 
+	//user can withdraw cash 
 	@PostMapping("/{userId}/withdraw")
 	public ResponseEntity<SavingsLimitedDTO> withdrawFunds(@PathVariable Long userId,
 			@RequestBody Map<String, BigDecimal> request) {
@@ -102,6 +106,7 @@ public class SavingsController {
 		}
 	}
 
+	//method which is responsible for checking amount related conditions.
 	private void validateAmount(BigDecimal amount, String errorMessage) {
 		if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
 			throw new IllegalArgumentException(errorMessage);

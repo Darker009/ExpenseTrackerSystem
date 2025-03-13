@@ -29,6 +29,7 @@ public class ExpenseController {
 		return savingsService.getUserSavings(userId) != null;
 	}
 
+	// add expenses with categories.
 	@PostMapping("/{userId}")
 	public ResponseEntity<ExpenseDTO> addExpense(@PathVariable Long userId, @RequestBody Expense expense) {
 		if (!userHasSavingsAccount(userId)) {
@@ -38,6 +39,7 @@ public class ExpenseController {
 		return ResponseEntity.ok(dto);
 	}
 
+	// user can fetch all the list of daily expenses.
 	@GetMapping("/{userId}")
 	public ResponseEntity<List<ExpenseDTO>> getUserExpenses(@PathVariable Long userId) {
 		if (!userHasSavingsAccount(userId)) {
@@ -47,6 +49,7 @@ public class ExpenseController {
 		return ResponseEntity.ok(expenses);
 	}
 
+	// user can fetch category wise also.
 	@GetMapping("/{userId}/category/{category}")
 	public ResponseEntity<List<ExpenseDTO>> getUserExpensesByCategory(@PathVariable Long userId,
 			@PathVariable ExpenseCategory category) {
@@ -57,6 +60,7 @@ public class ExpenseController {
 		return ResponseEntity.ok(expenses);
 	}
 
+	// user can fetch expenses date wise also.
 	@GetMapping("/{userId}/date")
 	public ResponseEntity<List<ExpenseDTO>> getUserExpensesByDateRange(@PathVariable Long userId,
 			@RequestParam String startDate, @RequestParam String endDate) {
@@ -74,6 +78,7 @@ public class ExpenseController {
 		}
 	}
 
+	// user can delete expenses.
 	@DeleteMapping("/{expenseId}")
 	public ResponseEntity<String> deleteExpense(@PathVariable Long expenseId) {
 		try {

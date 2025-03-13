@@ -20,6 +20,7 @@ public class UserController {
 		this.userService = userService;
 	}
 
+	//user can register with name, email, and password.
 	@PostMapping("/register")
 	public ResponseEntity<?> registerUser(@RequestBody User user) {
 		if (user.getEmail() == null || user.getPassword() == null) {
@@ -37,6 +38,7 @@ public class UserController {
 		}
 	}
 
+	//user can login with email and password
 	@PostMapping("/login")
 	public ResponseEntity<?> loginUser(@RequestBody User user) {
 		if (user.getEmail() == null || user.getPassword() == null) {
@@ -54,6 +56,7 @@ public class UserController {
 		}
 	}
 
+	//user can fetch details 
 	@GetMapping("/{id}")
 	public ResponseEntity<?> getUserDetails(@PathVariable Long id) {
 		try {
@@ -67,6 +70,7 @@ public class UserController {
 		}
 	}
 
+	//user can update only password(changes accordingly)
 	@PutMapping("/{id}")
 	public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody User userUpdates) {
 		try {
@@ -80,6 +84,7 @@ public class UserController {
 		}
 	}
 
+	//user can deactivate his account(this particular end-point deactivate the user but not delete)
 	@DeleteMapping("/{id}")
 	public ResponseEntity<?> deactivateUser(@PathVariable Long id) {
 		try {

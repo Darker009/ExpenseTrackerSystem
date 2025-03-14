@@ -34,44 +34,48 @@ public class UserService {
 	}
 
 	public UserDTO loginUser(String email, String password) {
-		User user = userRepository.findByEmail(email)
-				.orElseThrow(() -> new ResourceNotFoundException("Invalid email or password"));
+	    User user = userRepository.findByEmail(email)
+	            .orElseThrow(() -> new ResourceNotFoundException("Invalid email or password"));
 
-		if (!user.isActive()) {
-			throw new ResourceNotFoundException("Account is deactivated. Please contact support.");
-		}
+	    if (!user.isActive()) {
+	        throw new ResourceNotFoundException("Account is deactivated. Please contact support.");
+	    }
 
-		if (passwordEncoder.matches(password, user.getPassword())) {
-			return new UserDTO(user.getName(), user.getEmail(), user.getRegisteredAt());
-		}
+	    if (passwordEncoder.matches(password, user.getPassword())) {
+	        // Return a UserDTO that now includes the user ID.
+	        return new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getRegisteredAt());
+	    }
 
-		throw new ResourceNotFoundException("Invalid email or password");
+	    throw new ResourceNotFoundException("Invalid email or password");
 	}
 
+
 	public UserDTO getUserDetails(Long id) {
-		User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found"));
-		return new UserDTO(user.getName(), user.getEmail(), user.getRegisteredAt());
+	    User user = userRepository.findById(id)
+	            .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+	    return new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getRegisteredAt());
 	}
 
 	public UserDTO updateUser(Long id, User userUpdates) {
-		User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+	    User user = userRepository.findById(id)
+	            .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-		if (!user.isActive()) {
-			throw new ResourceNotFoundException("User is deactivated. Cannot update.");
-		}
+	    if (!user.isActive()) {
+	        throw new ResourceNotFoundException("User is deactivated. Cannot update.");
+	    }
 
-		if (userUpdates.getName() != null && !userUpdates.getName().isEmpty()) {
-			user.setName(userUpdates.getName());
-		}
-		if (userUpdates.getPassword() != null && !userUpdates.getPassword().isEmpty()) {
-			if (userUpdates.getPassword().length() < 6) {
-				throw new IllegalArgumentException("Password must be at least 6 characters long.");
-			}
-			user.setPassword(passwordEncoder.encode(userUpdates.getPassword()));
-		}
+	    if (userUpdates.getName() != null && !userUpdates.getName().isEmpty()) {
+	        user.setName(userUpdates.getName());
+	    }
+	    if (userUpdates.getPassword() != null && !userUpdates.getPassword().isEmpty()) {
+	        if (userUpdates.getPassword().length() < 6) {
+	            throw new IllegalArgumentException("Password must be at least 6 characters long.");
+	        }
+	        user.setPassword(passwordEncoder.encode(userUpdates.getPassword()));
+	    }
 
-		userRepository.save(user);
-		return new UserDTO(user.getName(), user.getEmail(), user.getRegisteredAt());
+	    userRepository.save(user);
+	    return new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getRegisteredAt());
 	}
 
 	public void deactivateUser(Long id) {

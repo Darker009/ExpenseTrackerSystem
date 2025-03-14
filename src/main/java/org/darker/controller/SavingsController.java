@@ -25,23 +25,23 @@ public class SavingsController {
 		this.savingsService = savingsService;
 	}
 
-	//user can create saving account with(aadharNo, panNo, address, balance, accountNo, phoneNo etc.)
+	// Endpoint to register a savings account for a user.
 	@PostMapping("/register/{userId}")
-	public ResponseEntity<SavingsDTO> registerSavings(@PathVariable Long userId,
-			@RequestBody SavingsDTO savingsRequest) {
+	public ResponseEntity<?> registerSavings(@PathVariable Long userId, @RequestBody SavingsDTO savingsRequest) {
 		try {
+			// Retrieve the user; if not found, throw exception.
 			User user = savingsService.getUserById(userId);
 			if (user == null) {
-				return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
 			}
 
+			// Create a new savings account using the provided details.
 			Savings savings = new Savings();
 			savings.setUser(user);
 			BigDecimal initialBalance = savingsRequest.getTotalBalance() != null ? savingsRequest.getTotalBalance()
 					: BigDecimal.ZERO;
 			savings.setTotalBalance(initialBalance);
 			savings.setRemainingBalance(initialBalance);
-
 			savings.setAadhaarNumber(savingsRequest.getAadhaarNumber());
 			savings.setAccountNumber(savingsRequest.getAccountNumber());
 			savings.setPanNumber(savingsRequest.getPanNumber());
@@ -53,75 +53,74 @@ public class SavingsController {
 			return ResponseEntity.status(HttpStatus.CREATED).body(new SavingsDTO(savedSavings));
 
 		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+			e.printStackTrace(); // Log full error details for debugging.
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to register savings. " + e.getMessage());
 		}
 	}
 
-	//user can check his balance.
+	// Endpoint to get savings details for a user.
 	@GetMapping("/{userId}")
-	public ResponseEntity<SavingsLimitedDTO> getUserSavings(@PathVariable Long userId) {
+	public ResponseEntity<?> getUserSavings(@PathVariable Long userId) {
 		try {
 			Savings savings = savingsService.getUserSavings(userId);
+			// Return only the remaining balance in the limited DTO.
 			SavingsLimitedDTO response = new SavingsLimitedDTO(savings.getId(), savings.getUser().getId(),
 					savings.getRemainingBalance());
 			return ResponseEntity.ok(response);
 		} catch (ResourceNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Savings not found for user.");
 		}
 	}
 
-	//user can deposit cash 
+	// Endpoint to deposit funds into the savings account.
 	@PostMapping("/{userId}/deposit")
-	public ResponseEntity<SavingsLimitedDTO> depositFunds(@PathVariable Long userId,
-			@RequestBody Map<String, BigDecimal> request) {
-		BigDecimal amount = request.get("amount");
-		validateAmount(amount, "Deposit amount must be greater than zero.");
+	public ResponseEntity<?> depositFunds(@PathVariable Long userId, @RequestBody Map<String, BigDecimal> request) {
 		try {
-			Savings savings = savingsService.depositFunds(userId, amount);
+			BigDecimal amount = request.get("amount");
+			validateAmount(amount, "Deposit amount must be greater than zero.");
 
+			Savings savings = savingsService.depositFunds(userId, amount);
 			SavingsLimitedDTO response = new SavingsLimitedDTO(savings.getId(), savings.getUser().getId(),
 					savings.getRemainingBalance());
 			return ResponseEntity.ok(response);
 		} catch (ResourceNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User savings not found.");
+		} catch (IllegalArgumentException e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
 		}
 	}
 
-	//user can withdraw cash 
+	// Endpoint to withdraw funds from the savings account.
 	@PostMapping("/{userId}/withdraw")
-	public ResponseEntity<SavingsLimitedDTO> withdrawFunds(@PathVariable Long userId,
-			@RequestBody Map<String, BigDecimal> request) {
-		BigDecimal amount = request.get("amount");
-		validateAmount(amount, "Withdrawal amount must be greater than zero.");
+	public ResponseEntity<?> withdrawFunds(@PathVariable Long userId, @RequestBody Map<String, BigDecimal> request) {
 		try {
+			BigDecimal amount = request.get("amount");
+			validateAmount(amount, "Withdrawal amount must be greater than zero.");
+
 			Savings savings = savingsService.withdrawFunds(userId, amount);
 			SavingsLimitedDTO response = new SavingsLimitedDTO(savings.getId(), savings.getUser().getId(),
 					savings.getRemainingBalance());
-
 			return ResponseEntity.ok(response);
 		} catch (ResourceNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User savings not found.");
 		} catch (InsufficientBalanceException e) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Insufficient balance.");
+		} catch (IllegalArgumentException e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
 		}
 	}
 
-	//method which is responsible for checking amount related conditions.
+	// Helper method to validate deposit/withdrawal amounts.
 	private void validateAmount(BigDecimal amount, String errorMessage) {
 		if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
 			throw new IllegalArgumentException(errorMessage);
 		}
 	}
 
+	// Global exception handler for the controller.
 	@ExceptionHandler({ ResourceNotFoundException.class, InsufficientBalanceException.class,
 			IllegalArgumentException.class })
 	public ResponseEntity<String> handleExceptions(Exception e) {
-		if (e instanceof ResourceNotFoundException) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-		}
-		if (e instanceof InsufficientBalanceException) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-		}
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
 	}
 }

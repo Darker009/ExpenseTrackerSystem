@@ -5,8 +5,10 @@ import org.darker.entity.User;
 import org.darker.exception.ResourceNotFoundException;
 import org.darker.service.UserService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
 
@@ -20,7 +22,7 @@ public class UserController {
 		this.userService = userService;
 	}
 
-	//user can register with name, email, and password.
+	// User registration with name, email, and password.
 	@PostMapping("/register")
 	public ResponseEntity<?> registerUser(@RequestBody User user) {
 		if (user.getEmail() == null || user.getPassword() == null) {
@@ -38,7 +40,7 @@ public class UserController {
 		}
 	}
 
-	//user can login with email and password
+	// User login with email and password.
 	@PostMapping("/login")
 	public ResponseEntity<?> loginUser(@RequestBody User user) {
 		if (user.getEmail() == null || user.getPassword() == null) {
@@ -56,7 +58,7 @@ public class UserController {
 		}
 	}
 
-	//user can fetch details 
+	// Fetch user details.
 	@GetMapping("/{id}")
 	public ResponseEntity<?> getUserDetails(@PathVariable Long id) {
 		try {
@@ -70,11 +72,13 @@ public class UserController {
 		}
 	}
 
-	//user can update only password(changes accordingly)
-	@PutMapping("/{id}")
-	public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody User userUpdates) {
+	// Update user profile (name, password, and optional profile image).
+	@PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestParam("name") String name,
+			@RequestParam("password") String password,
+			@RequestParam(value = "profileImage", required = false) MultipartFile profileImage) {
 		try {
-			UserDTO updatedUser = userService.updateUser(id, userUpdates);
+			UserDTO updatedUser = userService.updateUserWithProfile(id, name, password, profileImage);
 			return ResponseEntity.ok(updatedUser);
 		} catch (ResourceNotFoundException e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", e.getMessage()));
@@ -84,7 +88,7 @@ public class UserController {
 		}
 	}
 
-	//user can deactivate his account(this particular end-point deactivate the user but not delete)
+	// Deactivate the user account (deactivates but does not delete).
 	@DeleteMapping("/{id}")
 	public ResponseEntity<?> deactivateUser(@PathVariable Long id) {
 		try {

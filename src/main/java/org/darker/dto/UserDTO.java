@@ -7,6 +7,7 @@ public class UserDTO {
     private String name;
     private String email;
     private LocalDateTime registeredAt;
+    private String profileImageUrl; // New field
 
     public UserDTO() {
     }
@@ -17,6 +18,16 @@ public class UserDTO {
         this.email = email;
         this.registeredAt = registeredAt;
     }
+
+    public UserDTO(Long userId, String name, String email, LocalDateTime registeredAt, String profileImageUrl) {
+        this.userId = userId;
+        this.name = name;
+        this.email = email;
+        this.registeredAt = registeredAt;
+        this.profileImageUrl = profileImageUrl;
+    }
+
+    // Getters and Setters
 
     public Long getUserId() {
         return userId;
@@ -50,6 +61,14 @@ public class UserDTO {
         this.registeredAt = registeredAt;
     }
 
+    public String getProfileImageUrl() {
+        return profileImageUrl;
+    }
+
+    public void setProfileImageUrl(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
+    }
+
     @Override
     public String toString() {
         return "UserDTO{" +
@@ -57,6 +76,7 @@ public class UserDTO {
                 ", name='" + name + '\'' +
                 ", email='" + email + '\'' +
                 ", registeredAt=" + registeredAt +
+                ", profileImageUrl='" + profileImageUrl + '\'' +
                 '}';
     }
 }
